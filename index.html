@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LiteLang Compiler Visualizer</title>
+  <!-- D3 for drawing the AST tree -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <!-- Monaco Editor (VS Code editor) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Nunito:ital,wght@0,400;0,600;0,800;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <!-- Left: Logo -->
+    <div class="logo">
+      <svg viewBox="0 0 32 32" class="logo-icon">
+  <rect x="2" y="8" width="25" height="16" rx="3"/>
+  <path d="M8 13L12 16L8 19"/>
+  <line x1="14" y1="19" x2="20" y2="19"/>
+</svg>
+      <span>Lite<strong>Lang</strong></span>
+      <span class="badge">Compiler</span>
+    </div>
+    <!-- Pipeline stages indicator -->
+    <div class="pipeline" id="pipeline">
+      <div class="stage" data-stage="lex">Lexer</div>
+      <div class="stage-arrow">›</div>
+      <div class="stage" data-stage="parse">Parser</div>
+      <div class="stage-arrow">›</div>
+      <div class="stage" data-stage="sem">Semantics</div>
+      <div class="stage-arrow">›</div>
+      <div class="stage" data-stage="ir">IR</div>
+      <div class="stage-arrow">›</div>
+      <div class="stage" data-stage="bc">Bytecode</div>
+    </div>
+    <!-- Metric + Theme Toggle -->
+    <div class="topbar-right">
+      <div class="metric">
+        <span class="metric-label">Time</span>
+        <span class="metric-value" id="stat-time">—</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Tokens</span>
+        <span class="metric-value" id="stat-tokens">—</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Nodes</span>
+        <span class="metric-value" id="stat-nodes">—</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Memory</span>
+        <span class="metric-value" id="stat-memory">—</span>
+      </div>
+      <!-- Theme toggle button -->
+      <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
+        <span class="theme-icon-dark">☀</span>
+        <span class="theme-icon-light">☾</span>
+      </button>
+    </div>
+  </header>
+  <!--MAIN LAYOUT -->
+  <main class="workspace">
+    <!-- LEFT: Code Editor panel -->
+    <section class="panel editor-panel">
+      <!-- Editor toolbar: language badge + optimizer toggle -->
+      <div class="panel-header">
+        <div class="lang-badge">LiteLang</div>
+        <label class="optimizer-toggle">
+          <input type="checkbox" id="optimizer-on" />
+          <span class="toggle-slider"></span>
+          <span class="toggle-label">Optimizer</span>
+        </label>
+      </div>
+      <div id="monaco-editor"></div>
+      <!-- Compile button -->
+      <div class="editor-footer">
+        <button id="compile-btn" class="btn-compile">
+          <svg viewBox="0 0 20 20" fill="none"><polygon points="5,3 17,10 5,17" fill="currentColor"/></svg>
+          Compile
+        </button>
+        <span class="footer-hint">Ctrl+Enter to compile</span>
+      </div>
+    </section>
+    <!--Output pane -->
+    <section class="panel output-panel">
+      <!-- Tab navigation -->
+      <nav class="tabs">
+        <button class="tab active" data-tab="tokens">Tokens</button>
+        <button class="tab" data-tab="ast">AST Tree</button>
+        <button class="tab" data-tab="ir">IR Code</button>
+        <button class="tab" data-tab="vm">VM / Bytecode</button>
+        <button class="tab" data-tab="symbols">Symbols</button>
+        <button class="tab" data-tab="errors">
+          Errors
+          <span class="error-badge" id="error-count" style="display:none">0</span>
+        </button>
+      </nav>
+      <!-- TOKENS -->
+      <div class="tab-pane active" id="tab-tokens">
+        <div class="pane-intro">
+          <p>The <strong>lexer</strong> reads your source code and breaks it into <em>tokens</em> - the smallest meaningful units (keywords, numbers, operators etc).</p>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>#</th><th>Type</th><th>Value</th><th>Line</th><th>Col</th></tr></thead>
+            <tbody id="token-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <!-- AST TREE -->
+      <div class="tab-pane hidden" id="tab-ast">
+        <div class="pane-intro">
+          <p>The <strong>parser</strong> builds an Abstract Syntax Tree (AST) - a tree that represents the structure of your program. Click any node to inspect it.</p>
+        </div>
+        <div id="ast-container"></div>
+        <!-- Info popup for clicked nodes -->
+        <div id="node-popup" class="node-popup hidden">
+          <div class="popup-header">
+            <span id="popup-type" class="popup-type"></span>
+            <button id="popup-close">✕</button>
+          </div>
+          <div id="popup-body" class="popup-body"></div>
+        </div>
+      </div>
+      <!-- IR -->
+      <div class="tab-pane hidden" id="tab-ir">
+        <div class="pane-intro">
+          <p>The <strong>IR generator</strong> converts the AST into Three Address Code - a simple linear representation that's easy to analyse and optimise.</p>
+        </div>
+        <div class="code-scroll">
+          <pre id="ir-lines" class="ir-output"></pre>
+        </div>
+      </div>
+      <!-- VM / BYTECODE -->
+      <div class="tab-pane hidden" id="tab-vm">
+        <div class="vm-layout">
+          <!-- Controls row -->
+          <div class="vm-controls">
+            <button id="btn-run"   class="vm-btn primary">▶ Run</button>
+            <button id="btn-step"  class="vm-btn">Step</button>
+            <button id="btn-reset" class="vm-btn">Reset</button>
+            <div class="speed-wrap">
+              <span>Speed</span>
+              <input type="range" id="vm-speed" min="1" max="10" value="5" />
+            </div>
+            <span class="vm-status-label">Status: <strong id="vm-status">Ready</strong></span>
+          </div>
+          <!-- Instructions + Stack -->
+          <div class="vm-split">
+            <!-- Bytecode instruction list -->
+            <div class="vm-box">
+              <div class="vm-box-title">Instructions</div>
+              <div class="code-scroll" id="bytecode-scroll">
+                <pre id="bytecode-lines"></pre>
+              </div>
+            </div>
+            <!-- stack -->
+            <div class="vm-box">
+              <div class="vm-box-title">Stack</div>
+              <div id="stack-display">
+                <p class="empty-msg">empty</p>
+              </div>
+            </div>
+          </div>
+          <!-- Memory table -->
+          <div class="vm-box">
+            <div class="vm-box-title">Memory (Variables)</div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead><tr><th>Name</th><th>Value</th></tr></thead>
+                <tbody id="mem-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- TAB: SYMBOLS -->
+      <div class="tab-pane hidden" id="tab-symbols">
+        <div class="pane-intro">
+          <p>The <strong>Symbol Table</strong> keeps track of every variable: its name, type, scope and memory offset.</p>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Type</th><th>Scope</th><th>Const?</th><th>Value</th></tr></thead>
+            <tbody id="sym-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <!-- ERRORS -->
+      <div class="tab-pane hidden" id="tab-errors">
+        <div class="pane-intro">
+          <p>All <strong>Errors and Warnings</strong> from every stage of compilation are shown here.</p>
+        </div>
+        <div id="errors-list"></div>
+      </div>
+    </section>
+  </main>
+  <script src="lexer.js"></script>
+  <script src="parser.js"></script>
+  <script src="semantic.js"></script>
+  <script src="optimizer.js"></script>
+  <script src="ir.js"></script>
+  <script src="bytecode.js"></script>
+  <script src="vm.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
