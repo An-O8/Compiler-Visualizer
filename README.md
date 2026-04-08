@@ -66,6 +66,8 @@ python3 -m http.server 8080
 
 ## Project Structure
 
+```md
+```bash
 Compiler Visualizer/
 ├── index.html      # UI layout and tab structure
 ├── style.css       # Theme variables and layout
@@ -77,3 +79,5 @@ Compiler Visualizer/
 ├── ir.js           # Stage 5 - IR generator
 ├── bytecode.js     # Stage 6 - bytecode compiler
 └── vm.js           # Stage 7 - stack-based virtual machine
+```md
+```bash
