@@ -160,21 +160,25 @@ function tokenize(source) {
     if (two === '>=') { advance(); advance(); add(TT.GTE, '>=', start); continue; }
     if (two === '&&') { advance(); advance(); add(TT.AND, '&&', start); continue; }
     if (two === '||') { advance(); advance(); add(TT.OR,  '||', start); continue; }
-    if (two === '+=') { advance(); advance(); add(TT.COMPOUND_ASSIGN, '+=', start); continue; }
-    if (two === '-=') { advance(); advance(); add(TT.COMPOUND_ASSIGN, '-=', start); continue; }
-    if (two === '*=') { advance(); advance(); add(TT.COMPOUND_ASSIGN, '*=', start); continue; }
-    if (two === '/=') { advance(); advance(); add(TT.COMPOUND_ASSIGN, '/=', start); continue; }
-    if (two === '%=') { advance(); advance(); add(TT.COMPOUND_ASSIGN, '%=', start); continue; }
+    if (two === '+=') { advance(); advance(); add(TT.COMPOUND_ASSIGNMENT, '+=', start); continue; }
+    if (two === '-=') { advance(); advance(); add(TT.COMPOUND_ASSIGNMENT, '-=', start); continue; }
+    if (two === '*=') { advance(); advance(); add(TT.COMPOUND_ASSIGNMENT, '*=', start); continue; }
+    if (two === '/=') { advance(); advance(); add(TT.COMPOUND_ASSIGNMENT, '/=', start); continue; }
+    if (two === '%=') { advance(); advance(); add(TT.COMPOUND_ASSIGNMENT, '%=', start); continue; }
     // Single-character operators and punctuation
     const ch = source[i];
-    const single = {
-      '=': TT.ASSIGN,    '+': TT.PLUS,   '-': TT.MINUS,
-      '*': TT.STAR,      '/': TT.SLASH,  '%': TT.MODULO_OP,
-      '<': TT.LT,        '>': TT.GT,     '!': TT.NOT,
-      '(': TT.LPAREN,    ')': TT.RPAREN,
-      '{': TT.LBRACE,    '}': TT.RBRACE,
-      ';': TT.SEMICOLON, ',': TT.COMMA,
-    };
+  const single = {
+  '=': TT.ASSIGN,
+  '+': TT.ADDITION_OP,
+  '-': TT.SUBTRACTION_OP,
+  '*': TT.MULTIPLICATION_OP,
+  '/': TT.DIVISION_OP,
+  '%': TT.MODULO_OP,
+  '<': TT.LT,        '>': TT.GT,     '!': TT.NOT,
+  '(': TT.LPAREN,    ')': TT.RPAREN,
+  '{': TT.LBRACE,    '}': TT.RBRACE,
+  ';': TT.SEMICOLON, ',': TT.COMMA,
+};
     if (single[ch]) {
       advance();
       add(single[ch], ch, start);

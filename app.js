@@ -27,34 +27,12 @@ const SAMPLE_CODE = `// Welcome to LiteLang!
 int a = 10;
 int b = 3;
 float pi = 3.14;
-bool debug = true;
 
 // Arithmetic
 int sum = a + b;
 int product = a * b;
 float area = pi * a * a;
 
-// If / else
-if (sum > 10) {
-  int big = sum * 2;
-} else {
-  int small = sum;
-}
-
-// While loop
-int counter = 0;
-while (counter < 5) {
-  counter += 1;
-}
-
-// For loop
-int total = 0;
-for (int i = 0; i < 4; i += 1) {
-  total += i;
-}
-
-// Print
-print(total);
 `;
 function tokenColorClass(type) {
   if (type === 'KEYWORD')        return 'tok-type-keyword';

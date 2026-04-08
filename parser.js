@@ -112,7 +112,7 @@ class Parser {
     }
     //assignment
     if (tok.type === TT.IDENTIFIER &&
-        (this.peek(1).type === TT.ASSIGN || this.peek(1).type === TT.COMPOUND_ASSIGN)) {
+        (this.peek(1).type === TT.COMPOUND_ASSIGNMENT || this.peek(1).type === TT.COMPOUND_ASSIGN)) {
       return this.parseAssignment();
     }
     // expression statement
@@ -170,7 +170,7 @@ class Parser {
     this.expect(TT.SEMICOLON, ';');
     const idNode = new ASTNode('Identifier', id.value, [], id.line, id.col, id.start, id.end);
     // compound assign:  x += e  : Assignment(x, BinaryExpr(x + e))
-    if (op.type === TT.COMPOUND_ASSIGN) {
+    if (op.type === TT.COMPOUND_ASSIGNMENT) {
       const plainOp = op.value[0]; // '+', '-', '*', '/', '%'
       const loadId  = new ASTNode('Identifier', id.value, [], id.line, id.col, id.start, id.end);
       const binExpr = new ASTNode('BinaryExpr', plainOp, [loadId, expr], op.line, op.col, op.start, expr.end);
@@ -214,7 +214,7 @@ class Parser {
       if (this.peek().type === TT.KEYWORD && DECL_KW.includes(this.peek().value)) {
         init = this.parseVarDecl();
       } else if (this.peek().type === TT.IDENTIFIER &&
-                 (this.peek(1).type === TT.ASSIGN || this.peek(1).type === TT.COMPOUND_ASSIGN)) {
+                 (this.peek(1).type === TT.COMPOUND_ASSIGNMENT || this.peek(1).type === TT.COMPOUND_ASSIGN)) {
         init = this.parseAssignment();
       } else {
         init = this.parseExpression();
@@ -236,7 +236,7 @@ class Parser {
         const op  = this.advance();
         const expr = this.parseExpression();
         const idNode = new ASTNode('Identifier', id.value, [], id.line, id.col, id.start, id.end);
-        if (op.type === TT.COMPOUND_ASSIGN) {
+        if (op.type === TT.COMPOUND_ASSIGNMENT) {
           const plainOp = op.value[0];
           const loadId  = new ASTNode('Identifier', id.value, [], id.line, id.col, id.start, id.end);
           const bin     = new ASTNode('BinaryExpr', plainOp, [loadId, expr], op.line, op.col, op.start, expr.end);
@@ -285,7 +285,7 @@ class Parser {
   }
   parseAdditive() {
     let left = this.parseMultiplicative();
-    while (this.check(TT.PLUS, TT.MINUS)) {
+    while (this.check(TT.ADDITION_OP, TT.SUBTRACTION_OP)) {
       const op    = this.advance();
       const right = this.parseMultiplicative();
       left = new ASTNode('BinaryExpr', op.value, [left, right], op.line, op.col, left.start, right.end);
@@ -294,7 +294,7 @@ class Parser {
   }
   parseMultiplicative() {
     let left = this.parseUnary();
-    while (this.check(TT.STAR, TT.SLASH, TT.PERCENT)) {
+    while (this.check(TT.MULTIPLICATION_OP, TT.DIVISION_OP, TT.MODULO_OP)) {
       const op    = this.advance();
       const right = this.parseUnary();
       left = new ASTNode('BinaryExpr', op.value, [left, right], op.line, op.col, left.start, right.end);
@@ -307,7 +307,7 @@ class Parser {
       const expr = this.parseUnary();
       return new ASTNode('UnaryExpr', '!', [expr], op.line, op.col, op.start, expr.end);
     }
-    if (this.check(TT.MINUS)) {
+    if (this.check(TT.SUBTRACTION_OP)) {
       const op   = this.advance();
       const expr = this.parseUnary();
       return new ASTNode('UnaryExpr', '-', [expr], op.line, op.col, op.start, expr.end);
