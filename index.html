@@ -18,10 +18,10 @@
     <!-- Left: Logo -->
     <div class="logo">
       <svg viewBox="0 0 32 32" class="logo-icon">
-  <rect x="2" y="8" width="25" height="16" rx="3"/>
-  <path d="M8 13L12 16L8 19"/>
-  <line x1="14" y1="19" x2="20" y2="19"/>
-</svg>
+        <rect x="2" y="8" width="25" height="16" rx="3"/>
+        <path d="M8 13L12 16L8 19"/>
+        <line x1="14" y1="19" x2="20" y2="19"/>
+      </svg>
       <span>Lite<strong>Lang</strong></span>
       <span class="badge">Compiler</span>
     </div>
@@ -37,7 +37,7 @@
       <div class="stage-arrow">›</div>
       <div class="stage" data-stage="bc">Bytecode</div>
     </div>
-    <!-- Metric + Theme Toggle -->
+    <!-- Metric -->
     <div class="topbar-right">
       <div class="metric">
         <span class="metric-label">Time</span>
@@ -60,13 +60,38 @@
         <span class="theme-icon-dark">☀</span>
         <span class="theme-icon-light">☾</span>
       </button>
+      <!-- Hamburger button(mobile only)  -->
+      <button class="metrics-hamburger" id="metrics-hamburger" aria-label="Show metrics" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </header>
+  <!-- Mobile metrics drawer -->
+  <div class="metrics-drawer" id="metrics-drawer" aria-hidden="true">
+    <div class="metrics-drawer-inner">
+      <div class="metric">
+        <span class="metric-label">Time</span>
+        <span class="metric-value" id="stat-time-m">—</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Tokens</span>
+        <span class="metric-value" id="stat-tokens-m">—</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Nodes</span>
+        <span class="metric-value" id="stat-nodes-m">—</span>
+      </div>
+      <div class="metric">
+        <span class="metric-label">Memory</span>
+        <span class="metric-value" id="stat-memory-m">—</span>
+      </div>
+    </div>
+  </div>
   <!--MAIN LAYOUT -->
   <main class="workspace">
     <!-- LEFT: Code Editor panel -->
     <section class="panel editor-panel">
-      <!-- Editor toolbar: language badge + optimizer toggle -->
+      <!-- "LITELANG" + optimizer toggle -->
       <div class="panel-header">
         <div class="lang-badge">LiteLang</div>
         <label class="optimizer-toggle">
@@ -85,7 +110,7 @@
         <span class="footer-hint">Ctrl+Enter to compile</span>
       </div>
     </section>
-    <!--Output pane -->
+    <!--Output panel -->
     <section class="panel output-panel">
       <!-- Tab navigation -->
       <nav class="tabs">
@@ -138,7 +163,7 @@
       <!-- VM / BYTECODE -->
       <div class="tab-pane hidden" id="tab-vm">
         <div class="vm-layout">
-          <!-- Controls row -->
+          <!-- Controls -->
           <div class="vm-controls">
             <button id="btn-run"   class="vm-btn primary">▶ Run</button>
             <button id="btn-step"  class="vm-btn">Step</button>

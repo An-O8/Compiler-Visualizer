@@ -82,7 +82,7 @@
 
   --scroll-thumb:   rgba(0,0,0,0.15);
 }
-/*3. RESET & BASE*/
+/* RESET & BASE*/
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body {
   height: 100%;
@@ -92,7 +92,7 @@ html, body {
   color: var(--text-main);
   transition: background 0.3s, color 0.3s;
 }
-/*4. TOPBAR*/
+/* TOPBAR*/
 .topbar {
   height: 56px;
   background: var(--bg-panel);
@@ -103,6 +103,8 @@ html, body {
   gap: 24px;
   flex-shrink: 0;
   z-index: 50;
+  display: flex;
+  justify-content: space-between;
 }
 /* Logo */
 .logo {
@@ -202,7 +204,63 @@ html, body {
 [data-theme="dark"]  .theme-icon-dark  { display: inline; }
 [data-theme="light"] .theme-icon-dark  { display: none; }
 [data-theme="light"] .theme-icon-light { display: inline; }
-/*5. MAIN */
+
+/* Hamburger button - hidden on desktop, visible on mobile */
+.metrics-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-inset);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: border-color 0.2s, background 0.2s;
+}
+.metrics-hamburger span {
+  display: block;
+  width: 18px; height: 2px;
+  background: var(--text-main);
+  border-radius: 2px;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+  transform-origin: center;
+}
+.metrics-hamburger:hover { border-color: var(--accent); background: var(--bg-active); }
+/* Animated X state */
+.metrics-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.metrics-hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.metrics-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Mobile metrics drawer - hidden by default, shown on mobile when hamburger is active */
+.metrics-drawer {
+  display: none;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+  z-index: 40;
+}
+.metrics-drawer.open {
+  max-height: 80px;
+  opacity: 1;
+}
+.metrics-drawer-inner {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px 20px;
+  gap: 12px;
+}
+.metrics-drawer .metric {
+  align-items: center;
+}
+/* MAIN */
 .workspace {
   display: flex;
   gap: 16px;
@@ -210,7 +268,7 @@ html, body {
   height: calc(100vh - 56px);
   overflow: hidden;
 }
-/*6. PANELS*/
+/* PANELS*/
 .panel {
   background: var(--bg-panel);
   border: 1px solid var(--border);
@@ -220,17 +278,17 @@ html, body {
   overflow: hidden;
   transition: background 0.3s, border-color 0.3s;
 }
-/* Editor panel:*/
+/* Editor panel */
 .editor-panel {
   width: 400px;
   flex-shrink: 0;
 }
-/* Output panel:*/
+/* Output panel */
 .output-panel {
   flex: 1;
   min-width: 0;
 }
-/*7. EDITOR PANEL INTERNALS*/
+/* EDITOR PANEL INTERNALS*/
 .panel-header {
   display: flex;
   align-items: center;
@@ -279,6 +337,10 @@ html, body {
 #monaco-editor {
   flex: 1;
   min-height: 0;
+  padding-top: 20px;
+}
+.monaco-editor,.monaco-editor-background,.monaco-editor .margin{
+  background-color: transparent !important;
 }
 /* Editor footer */
 .editor-footer {
@@ -299,7 +361,7 @@ html, body {
   color: #fff;
   border: none;
   border-radius: 10px;
-  font-family: 'Syne', sans-serif;
+  font-family: 'Nunito', sans-serif;
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -314,7 +376,7 @@ html, body {
   color: var(--text-muted);
   font-family: 'JetBrains Mono', monospace;
 }
-/*8. TABS*/
+/* TABS*/
 .tabs {
   display: flex;
   border-bottom: 1px solid var(--border);
@@ -359,7 +421,7 @@ html, body {
   margin-left: 6px;
   vertical-align: middle;
 }
-/*9. TAB PANES */
+/* TAB PANES */
 .tab-pane {
   flex: 1;
   overflow: auto;
@@ -380,7 +442,7 @@ html, body {
 }
 .pane-intro strong { color: var(--text-main); }
 .pane-intro em     { color: var(--accent); font-style: normal; }
-/*10. DATA TABLES*/
+/* DATA TABLES */
 .table-wrap { overflow-x: auto; }
 .data-table {
   width: 100%;
@@ -423,9 +485,9 @@ html, body {
 .tok-type-ident    { color: var(--tok-ident);   }
 .tok-type-op       { color: var(--tok-op);      }
 .tok-type-punct    { color: var(--tok-punct);   }
-/* Row number column*/
+/* Row number column  */
 .col-num { color: var(--text-muted) !important; width: 32px; }
-/*11. IR / BYTECODE CODE DISPLAY */
+/* IR / BYTECODE CODE DISPLAY */
 .code-scroll {
   overflow: auto;
   height: 100%;
@@ -453,7 +515,7 @@ html, body {
   transition: background 0.15s, border-color 0.15s;
 }
 .code-line:hover { background: var(--bg-row-hover); }
-/* Currently-executing instruction highlight */
+/* Currently executing instruction highlight */
 .code-line.current {
   background: var(--instr-active-bg) !important;
   border-left-color: var(--instr-active-bd) !important;
@@ -474,7 +536,7 @@ html, body {
 .ir-label  { color: var(--accent-2); font-weight: 700; }
 .ir-temp   { color: var(--tok-number); }
 .ir-op     { color: var(--tok-op); }
-/*12. VM / BYTECODE TAB */
+/* VM / BYTECODE TAB */
 .vm-layout {
   display: flex;
   flex-direction: column;
@@ -577,10 +639,10 @@ html, body {
   text-align: center;
   padding: 20px;
 }
-/*13. AST TREE */
+/* AST TREE */
 #ast-container {
   width: 100%;
-  height: calc(100% - 70px);   /* leave room for the pane-intro */
+  height: calc(100% - 70px);   /* leave room for the pane intro */
   background: var(--bg-inset);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -666,7 +728,7 @@ html, body {
 .popup-row { display: flex; gap: 10px; }
 .popup-label { color: var(--text-muted); min-width: 60px; }
 .popup-value { color: var(--accent); font-weight: 600; }
-/*14. ERRORS LIST*/
+/* ERRORS LIST*/
 #errors-list { display: flex; flex-direction: column; gap: 8px; }
 .error-card {
   display: flex;
@@ -709,13 +771,104 @@ html, body {
   font-size: 0.85rem;
   font-weight: 600;
 }
-/*15. SCROLLBARS */
+/* SCROLLBARS */
 ::-webkit-scrollbar       { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
-/*16. COMPILE BUTTON*/
+/* COMPILE BUTTON*/
 .btn-compile.loading {
   opacity: 0.7;
   cursor: wait;
+}
+ /* RESPONSIVE - TABLET  (≤ 1024px) */
+@media (max-width: 1024px) {
+  .stage {
+    padding: 3px 8px;
+    font-size: 0.65rem;
+  }
+  .stage-arrow { font-size: 0.85rem; }
+  /* Tighten topbar gaps */
+  .topbar { gap: 12px; padding: 0 14px; }
+  .topbar-right { gap: 10px; }
+  /* Hide desktop metrics */
+  .metric .metric-label { font-size: 0.52rem; }
+  .metric .metric-value { font-size: 0.75rem; }
+  /* Stack panels vertically */
+  .workspace {
+    flex-direction: column;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+    padding: 10px;
+    gap: 10px;
+  }
+  .topbar-right .metric { display: none; }
+  /* Show hamburger button */
+  .metrics-hamburger { display: flex; }
+  /* Show metrics drawer element */
+  .metrics-drawer { display: block; }
+  .editor-panel {
+    width: 100%;
+    flex-shrink: 0;
+    height: 320px;
+    min-height: 280px;
+  }
+  .output-panel {
+    flex: 1;
+    min-height: 400px;
+  }
+  html, body { overflow: auto; }
+}
+/* RESPONSIVE - MOBILE  (≤ 640px) */
+@media (max-width: 640px) {
+  .stage { font-size: 7px; }
+  .topbar-right .metric { display: none; }
+  .metrics-hamburger { display: flex; }
+  .metrics-drawer { display: block; }
+  .topbar { padding: 0 12px; gap: 8px; height: 52px; }
+  .badge { display: none; }
+  .logo { font-size: 1rem; gap: 6px; }
+  .logo-icon { width: 22px; height: 22px; }
+  .workspace {
+    flex-direction: column;
+    height: auto;
+    min-height: calc(100vh - 52px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 8px;
+    gap: 8px;
+  }
+  html, body { overflow: auto; height: auto; }
+  .editor-panel {
+    width: 100%;
+    flex-shrink: 0;
+    height: 400px;
+    min-height: 240px;
+    border-radius: 12px;
+  }
+  .output-panel {
+    flex: none;
+    height: 520px;
+    min-height: 460px;
+    border-radius: 12px;
+  }
+  .tab {
+    padding: 10px 10px;
+    font-size: 0.68rem;
+    letter-spacing: 0;
+  }
+  .footer-hint { display: none; }
+  .editor-footer { padding: 8px 12px; }
+  .vm-split { grid-template-columns: 1fr; }
+  .vm-controls { gap: 8px; padding: 8px 10px; }
+  .vm-status-label { margin-left: 0; width: 100%; }
+  .pane-intro { font-size: 0.73rem; padding: 8px 10px; }
+  .node-popup {
+    width: calc(100% - 24px);
+    left: 12px; right: 12px;
+    top: 8px;
+  }
+  .metrics-drawer-inner { gap: 8px; padding: 8px 16px; }
+  .metrics-drawer.open { max-height: 70px; }
+  #ast-container { height: calc(100% - 80px); }
 }

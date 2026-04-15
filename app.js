@@ -26,13 +26,9 @@ const SAMPLE_CODE = `// Welcome to LiteLang!
 // Variable declarations
 int a = 10;
 int b = 3;
-float pi = 3.14;
 
 // Arithmetic
 int sum = a + b;
-int product = a * b;
-float area = pi * a * a;
-
 `;
 function tokenColorClass(type) {
   if (type === 'KEYWORD')        return 'tok-type-keyword';
@@ -162,10 +158,16 @@ function finishCompile(startTime) {
     ? (memBytes / 1024).toFixed(1) + ' KB'
     : memBytes + ' B';
   const el = id => document.getElementById(id);
+  // Update desktop topbar metrics
   el('stat-time'  ).textContent = ms + ' ms';
   el('stat-tokens').textContent = state.tokens.filter(t => t.type !== 'EOF').length;
   el('stat-nodes' ).textContent = state.finalAst ? countNodes(state.finalAst) : 0;
   if (el('stat-memory')) el('stat-memory').textContent = memStr;
+  // Sync mobile drawer metrics so they always reflect latest compile
+  if (el('stat-time-m'  )) el('stat-time-m'  ).textContent = ms + ' ms';
+  if (el('stat-tokens-m')) el('stat-tokens-m').textContent = state.tokens.filter(t => t.type !== 'EOF').length;
+  if (el('stat-nodes-m' )) el('stat-nodes-m' ).textContent = state.finalAst ? countNodes(state.finalAst) : 0;
+  if (el('stat-memory-m')) el('stat-memory-m').textContent = memStr;
   // Show the error badge on the errors tab
   const errCount    = state.errors.length;
   const badge       = document.getElementById('error-count');
@@ -455,8 +457,10 @@ function initMonaco() {
       automaticLayout: true,
       lineNumbers:     'on',
       scrollbar:       { vertical: 'auto', horizontal: 'auto' },
-      renderLineHighlight: 'line',
+      renderLineHighlight: 'none',
       wordWrap:        'on',
+      overviewRulerLanes: 0
+
     });
     // Ctrl+Enter : compile
     window.monacoEditor.addCommand(
@@ -482,6 +486,35 @@ function initTheme() {
     if (window.updateMonacoTheme) window.updateMonacoTheme(next === 'dark');
   });
 }
+//  MOBILE METRICS HAMBURGER TOGGLE
+function initMetricsHamburger() {
+  const btn    = document.getElementById('metrics-hamburger');
+  const drawer = document.getElementById('metrics-drawer');
+  if (!btn || !drawer) return;
+  btn.addEventListener('click', function() {
+    const isOpen = drawer.classList.contains('open');
+    if (isOpen) {
+      drawer.classList.remove('open');
+      drawer.setAttribute('aria-hidden', 'true');
+      btn.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    } else {
+      drawer.classList.add('open');
+      drawer.setAttribute('aria-hidden', 'false');
+      btn.classList.add('open');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+  });
+  // Close drawer when tapping outside of it
+  document.addEventListener('click', function(e) {
+    if (!drawer.contains(e.target) && !btn.contains(e.target)) {
+      drawer.classList.remove('open');
+      drawer.setAttribute('aria-hidden', 'true');
+      btn.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
 // Escape HTML special characters so values display safely
 function escHtml(str) {
   if (str == null) return '';
@@ -494,6 +527,7 @@ function escHtml(str) {
 // wire everything up once the page is ready
 document.addEventListener('DOMContentLoaded', function() {
   initTheme();  initMonaco();
+  initMetricsHamburger();
   // Compile button
   document.getElementById('compile-btn').addEventListener('click', compileCode);
   // Tab buttons
