@@ -1,51 +1,111 @@
 # LiteLang Compiler Visualizer
 
-A browser-based tool that compiles a small language called **LiteLang** and lets you see exactly what happens at every stage i.e, from raw source text to executing bytecode.
+A browser-based tool that compiles a small language called **LiteLang** and visualizes every stage of the compilation pipeline - from raw source text to executing bytecode, step by step.
 
-Built with vanilla JavaScript, no build step needed.
+🔗 **Live Demo:** https://compiler-visualizer.netlify.app/
+
+Built with vanilla JavaScript. No installation or build step needed.
+
+---
 
 ## LiteLang
 
-LiteLang is a small, statically typed language designed to be easy to compile and visualize. It supports:
+LiteLang is a small, statically typed language designed to be easy to compile and visualize.
 
-- Types : `int`, `float`, `bool`, `string`
-- Variable declarations : `let`, `const`, `var`
-- Control flow: `if / else`, `while`, `for`, `break`, `continue`, `return`
-- Operators : arithmetic (`+ - * / %`), comparison (`== != < > <= >=`), logical (`&& || !`), compound assignment (`+= -= *= /= %=`)
-- Built-in `print()` statement
-- Line comments `//` and block comments `/* */`
+### Syntax
 
-Example: let int x = 10;
-let int y = 3;
-if (x > y) {
-print(x - y);
+**Variable Declarations**
+```
+let x = 10;
+const pi = 3.14;
+var name = "Alice";
+int count = 0;
+float temp = 36.6;
+bool flag = true;
+string msg = "hello";
+```
+
+**Control Flow**
+```
+if (x > 0) {
+  print(x);
+} else {
+  print(0);
 }
+```
+
+```
+while (x > 0) {
+  x -= 1;
+}
+```
+
+```
+for (int i = 0; i < 5; i += 1) {
+  print(i);
+}
+```
+
+**Operators**
+- Arithmetic: `+ - * / %`
+- Comparison: `== != < > <= >=`
+- Logical: `&& || !`
+- Compound assignment: `+= -= *= /= %=`
+
+**Comments**
+```
+// line comment
+/* block comment */
+```
+
+### Example Program — Fibonacci
+```
+int a = 0;
+int b = 1;
+int i = 0;
+while (i < 10) {
+  int temp = a + b;
+  a = b;
+  b = temp;
+  i += 1;
+  print(a);
+}
+```
+
+---
 
 ## The Compiler Pipeline
 
 Each stage runs in sequence and gets its own tab in the UI:
 
-**1. Lexer** (`lexer.js`) — Breaks raw source into a token stream, tagging every word and symbol with its type and source position.
+| Stage | File | Description |
+|-------|------|-------------|
+| 1. Lexer | `lexer.js` | Breaks source into a token stream, tagging every word and symbol with its type and position |
+| 2. Parser | `parser.js` | Builds an Abstract Syntax Tree (AST) using recursive descent parsing |
+| 3. Optimizer | `optimizer.js` | Simplifies the AST via constant folding before code generation |
+| 4. Semantic Analysis | `semantic.js` | Validates types and scopes, catching errors like undeclared variables or type mismatches |
+| 5. IR Generation | `ir.js` | Converts the AST into a three address intermediate representation |
+| 6. Bytecode | `bytecode.js` | Compiles the IR into stack machine instructions |
+| 7. VM | `vm.js` | Executes the bytecode, one instruction at a time |
 
-**2. Parser** (`parser.js`) — Builds an Abstract Syntax Tree (AST) from the token stream. Visualized as an interactive D3 tree diagram.
+---
 
-**3. Optimizer** (`optimizer.js`) — Simplifies the AST before code generation via constant folding.
+## Features
 
-**4. Semantic Analysis** (`semantic.js`) — Walks the AST to validate types and scopes, catching errors like undeclared variables or type mismatches.
+- **Monaco Editor** — VS Code's editor with full keyboard shortcuts and syntax highlighting
+- **D3 AST Visualizer** — interactive, pannable and zoomable tree of your program's structure
+- **Step-through VM** — execute one bytecode instruction at a time, watching the stack and memory change live
+- **Errors tab** — all parser, semantic, and runtime errors shown in one place with line numbers
+- **Dark / Light theme** toggle
+- **Optimizer toggle** — compile with or without constant folding to compare outputs
 
-**5. IR Generation** (`ir.js`) — Converts the AST into a three address intermediate representation.
+---
 
-**6. Bytecode** (`bytecode.js`) — Compiles the IR down to a list of stack machine instructions.
-
-**7. VM** (`vm.js`) — Executes the bytecode. You can step through one instruction at a time and watch the stack and memory change live.
-
-## Running It
-
-No installation or build step - just open `index.html` in your browser :
+## Running Locally
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/compiler-visualizer.git
-cd compiler-visualizer
+git clone https://github.com/An-O8/Compiler-Visualizer.git
+cd Compiler-Visualizer
 open index.html
 ```
 
@@ -56,27 +116,31 @@ npx serve .
 # or
 python3 -m http.server 8080
 ```
-## Features
 
-- **Monaco Editor** (VS Code's editor) with full keyboard shortcuts
-- **D3 AST visualizer** - pannable and zoomable tree of your program's structure
-- **Step through VM** - execute one bytecode instruction at a time, inspecting the stack and memory at each step
-- **Dark / light theme** toggle
-- **Optimizer toggle** - compile with or without constant folding to compare outputs
+Then open `http://localhost:8080` in your browser.
+
+---
 
 ## Project Structure
 
-
-```md
-Compiler Visualizer/
-├── index.html      # UI layout and tab structure
-├── style.css       # Theme variables and layout
-├── app.js          # Pipeline and D3 AST renderer
-├── lexer.js        # Stage 1 - tokenizer
-├── parser.js       # Stage 2 - recursive descent parser
-├── optimizer.js    # Stage 3 - constant folding optimizer
-├── semantic.js     # Stage 4 - type checker and scope analyzer
-├── ir.js           # Stage 5 - IR generator
-├── bytecode.js     # Stage 6 - bytecode compiler
-└── vm.js           # Stage 7 - stack-based virtual machine
 ```
+Compiler-Visualizer/
+├── index.html       # UI layout and tab structure
+├── style.css        # Theme variables and layout
+├── app.js           # Pipeline orchestration and D3 AST renderer
+├── lexer.js         # Stage 1 - tokenizer
+├── parser.js        # Stage 2 - recursive descent parser
+├── optimizer.js     # Stage 3 - constant folding optimizer
+├── semantic.js      # Stage 4 - type checker and scope analyzer
+├── ir.js            # Stage 5 - IR generator
+├── bytecode.js      # Stage 6 - bytecode compiler
+└── vm.js            # Stage 7 - stack-based virtual machine
+```
+
+---
+
+## Deployment
+
+Deployed on **Netlify** via GitHub integration.
+
+Live at: https://compiler-visualizer.netlify.app/
