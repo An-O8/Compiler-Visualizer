@@ -112,8 +112,10 @@ class Parser {
     }
     //assignment
     if (tok.type === TT.IDENTIFIER &&
-        (this.peek(1).type === TT.COMPOUND_ASSIGNMENT || this.peek(1).type === TT.COMPOUND_ASSIGN)) {
-      return this.parseAssignment();
+        (this.peek(1).type === TT.COMPOUND_ASSIGNMENT || 
+         this.peek(1).type === TT.COMPOUND_ASSIGN ||
+         this.peek(1).type === TT.ASSIGN)) {
+     return this.parseAssignment();
     }
     // expression statement
     const expr = this.parseExpression();
