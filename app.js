@@ -380,22 +380,44 @@ function drawAST(ast) {
   });
 }
 //Node info popup 
+const NODE_DESCRIPTIONS = {
+  Program:      'The root of the entire program. All statements are its children.',
+  Block:        'A block of statements enclosed in { }. Creates a new scope.',
+  VarDecl:      'A variable declaration (let/const/var/int/float/bool/string). Defines a new variable in the current scope.',
+  Assignment:   'Assigns a new value to an already-declared variable.',
+  BinaryExpr:   'A binary operation between two expressions (e.g. a + b, x == y).',
+  LogicalExpr:  'A logical operation: && (AND) or || (OR) between two boolean expressions.',
+  UnaryExpr:    'A unary operation applied to one expression: negation (-) or logical NOT (!).',
+  Identifier:   'A reference to a previously declared variable by name.',
+  IntLiteral:   'An integer number literal (e.g. 42, -7).',
+  FloatLiteral: 'A floating-point number literal (e.g. 3.14, 2.0).',
+  BoolLiteral:  'A boolean literal: true or false.',
+  StringLiteral:'A string literal enclosed in quotes (e.g. "hello").',
+  IfStmt:       'An if/else conditional statement. Evaluates a condition and branches accordingly.',
+  WhileStmt:    'A while loop. Repeats its body as long as the condition is true.',
+  ForStmt:      'A for loop with optional init, condition, and update expressions.',
+  PrintStmt:    'Prints the value of an expression to the output.',
+};
 function showNodePopup(nd) {
   const popup = document.getElementById('node-popup');
   const data  = nd.data;
   document.getElementById('popup-type').textContent = data.type;
+  const desc = NODE_DESCRIPTIONS[data.type] || 'An AST node representing a part of the program structure.';
   const rows = [
     ['Value',    data.value  != null ? data.value : '—'],
     ['Line',     data.line   || '—'],
     ['Depth',    nd.depth],
     ['Children', (data.children || []).length],
   ];
-  document.getElementById('popup-body').innerHTML = rows.map(([k, v]) => `
+  document.getElementById('popup-body').innerHTML = `
+    <div class="popup-desc">${escHtml(desc)}</div>
+    <div class="popup-divider"></div>
+    ${rows.map(([k, v]) => `
     <div class="popup-row">
       <span class="popup-label">${k}</span>
       <span class="popup-value">${escHtml(String(v))}</span>
     </div>
-  `).join('');
+  `).join('')}`;
   popup.classList.remove('hidden');
 }
 //Highlight a range in the Monaco editor
